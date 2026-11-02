@@ -1,0 +1,23 @@
+name: Create Release
+
+# Pushing a tag such as 0.1.0 builds the Docker image and pushes it to ghcr.io.
+# The build itself is done by the shared vantage6 workflow (pinned to a commit), which calls
+# `make image ... PUSH_REG=true` from the Makefile in this repository.
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+# The shared workflow needs these permissions; a caller must grant them explicitly (the default
+# token permissions of a new personal repository are read-only).
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    uses: vantage6/vantage6-workflows/.github/workflows/algorithm-release.yml@5fa2c79619a7660dda02b2c80623fc010f66d661
+    secrets: inherit
+    with:
+      docker_image: ghcr.io/weejweejweejpunt-ops/v6-poc-count-py
