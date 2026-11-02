@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "v6-poc-count-py"
-version = "0.1.0"
+version = "0.1.1"
 description = "vantage6 v5 proof of concept: federated count of rows per value of a column (default: gender)"
 readme = "README.md"
 requires-python = ">=3.13"

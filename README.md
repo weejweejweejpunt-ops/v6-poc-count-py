@@ -61,6 +61,20 @@ git push origin 0.1.0
 `.github/workflows/release.yml` calls the shared vantage6 workflow (pinned to a commit), which runs `make image` and pushes
 `ghcr.io/weejweejweejpunt-ops/v6-poc-count-py:<version>-v6-<vantage6 version>`, `:latest` and `:<vantage6 major>`.
 
+**Image format.** The algorithm store looks up the digest of an image with an `Accept` header for the plain Docker v2 manifest only
+(`get_digest` in vantage6-common 5.0.3). A recent buildx pushes an OCI image index with attestations by default, which gives HTTP 404 there:
+version 0.1.0 had that problem. The `Makefile` therefore builds with `--provenance=false --sbom=false`, on a `docker-container` builder, and
+exports with `oci-mediatypes=false`. The last job of the release workflow (`verify-store-compatible`) checks this and fails the release otherwise.
+To check it by hand:
+
+```bash
+TOKEN=$(curl -s "https://ghcr.io/token?scope=repository:weejweejweejpunt-ops/v6-poc-count-py:pull" | python -c 'import sys,json; print(json.load(sys.stdin)["token"])')
+curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+  https://ghcr.io/v2/weejweejweejpunt-ops/v6-poc-count-py/manifests/latest
+```
+
+`200` is good, `404` means the image cannot be used with the store.
+
 After the first push, open the package on GitHub (Packages > `v6-poc-count-py` > Package settings) and set the visibility to **public**, otherwise
 the nodes cannot pull the image without a pull secret. Also check under the repository Settings > Actions > General that workflows are allowed.
 
