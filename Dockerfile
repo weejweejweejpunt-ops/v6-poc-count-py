@@ -6,6 +6,11 @@
 ARG BASE=5.0
 FROM ghcr.io/vantage6/infrastructure/algorithm-base:${BASE}
 
+# Links the image on ghcr.io to this repository. Without it a GitHub Actions workflow can create the package,
+# but a later release may be refused write access to it.
+LABEL org.opencontainers.image.source="https://github.com/weejweejweejpunt-ops/v6-poc-count-py"
+LABEL org.opencontainers.image.description="vantage6 v5 proof of concept: federated count of rows per value of a column"
+
 # Change this to the package name of your project. This needs to be the same
 # as what you specified for the name in the `setup.py`.
 ARG PKG_NAME="v6_poc_count"
